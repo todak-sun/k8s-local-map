@@ -28,7 +28,7 @@
 
 ```sh
 pnpm install
-sudo pnpm start # /etc/hosts 파일을 조작하므로, 관리자 권한으로 실행해야 함
+pnpm start
 ```
 
 - 프로그램이 실행되면 Settings에 설정한 값을 토대로 ${deployment-name}.${namespace-name} 의 규칙을 가진 로컬 Domain Name이 생깁니다.

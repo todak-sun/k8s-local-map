@@ -3,7 +3,7 @@ import * as path from "path";
 import { createLogger } from "../logger";
 import { configuration } from "../configuration";
 
-const serializeCommand = (event: string, command: string[]) => `| ${event} | COMMAND - ${command.join(" ")}`;
+const serializeCommand = (event: string, command: string[]) => `| ${event} | COMMAND - docker compose ${command.join(" ")}`;
 
 const dockerCompose = async (...command: string[]) => {
   const log = createLogger("dockerCompose");

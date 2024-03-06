@@ -5,6 +5,7 @@ import { dockerCompose, ku } from "./process";
 import { writeNginxConfFile } from "./proxy";
 import { Mapping } from "./types";
 import { readFile } from "./utils";
+import * as sudo from "sudo-prompt";
 
 const HOSTS_START_COMMENT = "# FOR_DEVELOPMENT_WITH_K8S_START";
 const HOSTS_END_COMMENT = "# FOR_DEVELOPMENT_WITH_K8S_END";
@@ -36,7 +37,7 @@ async function main() {
   // await resetHost();
   // 세팅 읽기
   const settings = await readSettings();
-  if (!settings.mappings) {
+  if (!settings.mappings?.length) {
     throw new Error("설정할 매핑 정보가 존재하지 않습니다.");
   }
 
@@ -59,7 +60,23 @@ async function main() {
   // etc/hosts 파일 업데이트
   const content = await fs.readFile(configuration.hostsPath, { encoding: "utf-8" });
   const updatedEtcdText = [content, textToWrite.join("\n")].join("");
-  await fs.writeFile(configuration.hostsPath, updatedEtcdText, { encoding: "utf-8" });
+  const sudoResult = await new Promise((resolve, reject) => {
+    sudo.exec(`echo "${updatedEtcdText}" > ${configuration.hostsPath}`, { name: "k8sLocalMap" }, (error, stdout, stderr) => {
+      if (error) {
+        reject(error);
+      }
+      if (stdout) {
+        console.log(stdout);
+      }
+      if (stderr) {
+        console.error(stderr);
+      }
+      resolve(true);
+    });
+  });
+
+  console.log({ sudoResult });
+  // await fs.writeFile(configuration.hostsPath, updatedEtcdText, { encoding: "utf-8" });
 
   const nginxConfs = await Promise.all(
     Object.entries(k8sMappingMap).map(async ([context, items]) => {

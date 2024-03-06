@@ -5,8 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rimraf ./dist",
     "dev": "cross-env NODE_ENV=development ts-node src/index.ts",
-    "prebuild": "rimraf ./dist",
+    "prebuild": "pnpm clean",
     "build": "tsc",
     "prestart": "pnpm build",
     "start": "cross-env NODE_ENV=production node dist/index.js"
@@ -15,14 +16,15 @@
   "author": "tjsdydwn@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "chalk": "^4"
+    "chalk": "^4",
+    "sudo-prompt": "^9.2.1"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3",
     "@types/node": "^20.11.24",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3",
+    "cross-env": "^7.0.3",
     "pnpm": "^8.15.3",
-    "rimraf": "^5.0.5"
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }

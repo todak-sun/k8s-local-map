@@ -4,3 +4,4 @@ tests
 dist
 default.conf
 my-settings
+.DS_Store
