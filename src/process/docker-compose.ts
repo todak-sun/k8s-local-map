@@ -32,7 +32,7 @@ const dockerCompose = async (...command: string[]) => {
 
     child.stderr.on("data", (chunk) => {
       const message = chunk.toString();
-      log.error({ message });
+      log.trace({ message });
     });
     child.on("message", (message, sendHandle) => {
       log.debug({
@@ -68,6 +68,6 @@ export default {
     dockerCompose("-f", path.resolve(configuration.assetsPath, "docker-compose.yaml"), "-p", PROJECT_NAME, "up");
   },
   down: async () => {
-    dockerCompose("down", "-p", PROJECT_NAME);
+    dockerCompose("down", PROJECT_NAME);
   },
 };

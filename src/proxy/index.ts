@@ -1,7 +1,8 @@
-import { createLogger } from "../logger";
-import { configuration } from "../configuration";
-import { makeDirectory, writeFile } from "../utils";
 import * as path from "path";
+import { configuration } from "../configuration";
+import { createLogger } from "../logger";
+import { PortForwardResult } from "../types";
+import { makeDirectory, writeFile } from "../utils";
 
 type Props = {
   serverName: string;
@@ -23,9 +24,9 @@ export const templateNginxConf = ({ serverName, localPort }: Props) => {
   `;
 };
 
-export const writeNginxConfFile = async (items: Props[]) => {
+export const createNginxReverseProxyConfig = async (portForwardResults: PortForwardResult[]) => {
   const confDirectory = path.resolve(configuration.assetsPath, "etc", "nginx", "conf.d");
-  const content = items.map((item) => templateNginxConf(item)).join("\n");
+  const content = portForwardResults.map((item) => templateNginxConf(item)).join("\n");
   await makeDirectory(confDirectory);
   await writeFile(path.resolve(confDirectory, "default.conf"), content);
 };

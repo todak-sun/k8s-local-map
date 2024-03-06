@@ -8,11 +8,14 @@ type LoggerProps = {
 
 export class Logger {
   constructor(private readonly context?: string) {}
+  trace = ({ options, message, context }: LoggerProps) => {
+    console.log(chalk.magenta(`[TRACE] [${this.context || context}] - ${message || ""} ${options ? `${options}` : ""}`));
+  };
   debug = ({ options, message, context }: LoggerProps) => {
-    console.log(chalk.cyan(`[DEBUG][${this.context || context}] - ${message || ""} ${options ? `${options}` : ""}`));
+    console.log(chalk.cyan(`[DEBUG] [${this.context || context}] - ${message || ""} ${options ? `${options}` : ""}`));
   };
   error = ({ options, message, context }: LoggerProps) => {
-    console.log(chalk.red(`[ERROR][${this.context || context}] - ${message || ""} ${options ? `${options}` : ""}`));
+    console.log(chalk.red(`[ERROR] [${this.context || context}] - ${message || ""} ${options ? `${options}` : ""}`));
   };
 }
 

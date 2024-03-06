@@ -24,3 +24,8 @@ export type Mapping = {
 export type Settings = {
   mappings?: Mapping[];
 };
+
+export type PortForwardResult = {
+  serverName: string;
+  localPort: number;
+};
