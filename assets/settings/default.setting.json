@@ -1,0 +1,9 @@
+{
+  "mappings": [
+    {
+      "context": "<your-cluster-name>",
+      "deployment": "<your-deployment-name>",
+      "namespace": "<your-namespace-name>"
+    }
+  ]
+}

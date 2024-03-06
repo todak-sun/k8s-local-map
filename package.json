@@ -2,17 +2,27 @@
   "name": "k8s-local-map",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js",
-    "dev": "cross-env NODE_ENV=development node src/index.js"
+    "dev": "cross-env NODE_ENV=development ts-node src/index.ts",
+    "prebuild": "rimraf ./dist",
+    "build": "tsc",
+    "prestart": "pnpm build",
+    "start": "cross-env NODE_ENV=production node dist/index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "tjsdydwn@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "chalk": "^4.1.2",
-    "cross-env": "^7.0.3"
+    "chalk": "^4"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "@types/node": "^20.11.24",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "pnpm": "^8.15.3",
+    "rimraf": "^5.0.5"
   }
 }
