@@ -33,7 +33,7 @@ const resetHost = async () => {
 
 async function main() {
   // 해당 프로그램을 통해 호스트 파일을 변환한 적이 있다면, 초기화
-  await resetHost();
+  // await resetHost();
   // 세팅 읽기
   const settings = await readSettings();
   if (!settings.mappings) {
@@ -63,12 +63,11 @@ async function main() {
 
   const nginxConfs = await Promise.all(
     Object.entries(k8sMappingMap).map(async ([context, items]) => {
+      await ku.changeContext(context);
       return await Promise.all(
         items.map(async ({ namespace, deployment }) => {
-          await ku.changeContext(context);
           const [pod] = await ku.getPods({ namespace, deployment });
           const { pod: podName, port } = pod;
-
           const { localPort } = await ku.portForwardWithPod({ namespace, deployment, pod: podName, port });
           const serverName = `${pod.deployment}.${pod.namespace}`;
           console.log(`http://${serverName} -> http://127.0.0.1:${localPort}`);
@@ -87,6 +86,7 @@ async function main() {
 process.on("SIGINT", async (signal) => {
   console.log(`signal : ${signal}`);
   await resetHost();
+  await dockerCompose.down();
   await new Promise((resolve) =>
     setTimeout(() => {
       resolve(process.exit(0));

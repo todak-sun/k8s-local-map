@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 import { createLogger } from "../logger";
 import { Deployment, PortForwardDeplyoment, PortForwardPod } from "../types";
 
-const serializeCommand = (event: string, command: string[]) => `| ${event} | COMMAND - ${command.join(" ")}`;
+const serializeCommand = (event: string, command: string[]) => `| ${event} | COMMAND - kubectl ${command.join(" ")}`;
 
 const kubectl = async (...command: string[]) => {
   const log = createLogger("kubectl");
@@ -31,6 +31,7 @@ const kubectl = async (...command: string[]) => {
 
     child.stderr.on("data", (chunk) => {
       const message = chunk.toString();
+      log.error({ message, options: serializeCommand("child.stderr.on", [...command]) });
       reject(new Error(message));
     });
     child.on("message", (message, sendHandle) => {

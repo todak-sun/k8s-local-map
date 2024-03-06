@@ -67,4 +67,7 @@ export default {
   up: async () => {
     dockerCompose("-f", path.resolve(configuration.assetsPath, "docker-compose.yaml"), "-p", PROJECT_NAME, "up");
   },
+  down: async () => {
+    dockerCompose("down", "-p", PROJECT_NAME);
+  },
 };
