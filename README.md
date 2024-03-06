@@ -30,7 +30,8 @@
 pnpm install
 pnpm start
 ```
-- 프로그램이 실행되면 Settings에 설정한 값을 토대로 `deployment.namespace` 의 규칙을 가진 로컬 Domain Name이 생깁니다.
+- 실행과정 중, `hosts` 파일을 변조하기 위해 두 차례의 비밀번호 확인 과정이 있습니다.
+- Settings에 설정한 값을 토대로 `deployment.namespace` 의 규칙을 가진 로컬 Domain Name이 생깁니다.
 - 따라서, `http://deployment.namespace` 로 요청한다면 쿠버네티스에 동일한 이름으로 배포된 서비스로 요청이 들어갑니다.
 
 ## How to Working
@@ -43,6 +44,6 @@ pnpm start
 - 따라서, `http://<deployment>.<namespace>`로 사용자가 요청을 하면, 도커 위에 구동되고 있는 Nginx에 의해 HOST PC에 포트포워딩 된 서비스로 요청이 가능해집니다.
 
 ## Warning
-
+- `hosts` 파일을 변조합니다.
 - MacOS에서만 테스트를 해본 관계로, 다른 OS에서는 정상 작동하지 않을 수 있습니다.
 - grpc 프로토콜은 지원하지 않습니다.
