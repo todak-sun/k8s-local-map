@@ -65,9 +65,9 @@ const PROJECT_NAME = "k8s-local-map";
 
 export default {
   up: async () => {
-    dockerCompose("-f", path.resolve(configuration.assetsPath, "docker-compose.yaml"), "-p", PROJECT_NAME, "up");
+    await dockerCompose("-f", path.resolve(configuration.assetsPath, "docker-compose.yaml"), "-p", PROJECT_NAME, "up");
   },
   down: async () => {
-    dockerCompose("down", PROJECT_NAME);
+    await dockerCompose("down", PROJECT_NAME);
   },
 };
