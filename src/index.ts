@@ -1,8 +1,11 @@
+import { Server } from "http";
 import { readSettings } from "./app/settings";
 import { createLogger } from "./logger";
-import { dockerCompose, modifyHosts, portForward, clearUnusedHosts } from "./process";
-import { createNginxReverseProxyConfig } from "./proxy";
+import { modifyHosts, portForward } from "./process";
+import { createReverseProxyServer } from "./proxy";
 import { Mapping } from "./types";
+
+let proxyServer: Server;
 
 async function main() {
   const settings = await readSettings();
@@ -18,8 +21,10 @@ async function main() {
   }, {} as Record<string, Mapping[]>);
 
   const portForwardResults = await portForward(k8sMappingMap);
-  await createNginxReverseProxyConfig(portForwardResults);
-  await dockerCompose.up();
+  proxyServer = createReverseProxyServer(portForwardResults);
+
+  // await createNginxReverseProxyConfig(portForwardResults);
+  // await dockerCompose.up();
   await modifyHosts(k8sMappingMap);
 }
 
@@ -27,7 +32,9 @@ main();
 
 const gracefulShutdown: NodeJS.SignalsListener = async (signal) => {
   const log = createLogger("gracefulShutdown");
-  await dockerCompose.down();
+
+  proxyServer?.close();
+
   await new Promise((resolve) => {
     log.debug({ message: "Gracefully Shutdown..." });
     setTimeout(() => {
