@@ -22,9 +22,6 @@ async function main() {
 
   const portForwardResults = await portForward(k8sMappingMap);
   proxyServer = createReverseProxyServer(portForwardResults);
-
-  // await createNginxReverseProxyConfig(portForwardResults);
-  // await dockerCompose.up();
   await modifyHosts(k8sMappingMap);
 }
 
