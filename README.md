@@ -6,7 +6,7 @@
   - kubectl 및 사용하고자 하는 cluster에 대한 설정
   - node.js
   - pnpm
-  - docker
+  - ~~docker~~ > 도커를 사용하지 않습니다.
 
 ## Settings
 
@@ -38,9 +38,10 @@ pnpm start
 - 세팅 파일에 입력한 내용을 토대로, `kubectl`을 통해 클러스터에 배포된 `pod`의 이름과 `port` 정보를 얻습니다.
 - 얻은 정보를 가지고 다음의 작업을 진행합니다.
   - `kubectl port-forward` 명령어로 로컬 PC에 대상 서비스 모두를 Random한 Port에 대해 Port Forwarding 합니다.
-  - `<deployment>.<namespace>`을 Server Name으로 하는 Nginx Config 파일을 생성하고, 위에서 Random하게 결정된 포트들에 proxy pass를 설정합니다.
-    - 생성된 Nginx Config 파일은 모두 80 Port를 Listen 합니다.
-    - 생성된 Config를 Volume Mount한 Nginx Container가 실행됩니다.
+    - `<deployment>.<namespace>`을 Host로, Random하게 결정된 포트들에 요청이 떨어질 수 있게끔 설정된 Reverse Proxy Server를 띄웁니다.
+  - ~~`<deployment>.<namespace>`을 Server Name으로 하는 Nginx Config 파일을 생성하고, 위에서 Random하게 결정된 포트들에 proxy pass를 설정합니다.~~
+    - ~~생성된 Nginx Config 파일은 모두 80 Port를 Listen 합니다.~~
+    - ~~생성된 Config를 Volume Mount한 Nginx Container가 실행됩니다.~~
 - 따라서, `http://<deployment>.<namespace>`로 사용자가 요청을 하면, 도커 위에 구동되고 있는 Nginx에 의해 HOST PC에 포트포워딩 된 서비스로 요청이 가능해집니다.
 
 ## Warning

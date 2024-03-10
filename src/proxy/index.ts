@@ -3,6 +3,8 @@ import { configuration } from "../configuration";
 import { createLogger } from "../logger";
 import { PortForwardResult } from "../types";
 import { makeDirectory, writeFile } from "../utils";
+import express from "express";
+import { createProxyMiddleware } from "http-proxy-middleware";
 
 type Props = {
   serverName: string;
@@ -29,4 +31,28 @@ export const createNginxReverseProxyConfig = async (portForwardResults: PortForw
   const content = portForwardResults.map((item) => templateNginxConf(item)).join("\n");
   await makeDirectory(confDirectory);
   await writeFile(path.resolve(confDirectory, "default.conf"), content);
+};
+
+export const createReverseProxyServer = (portForwardResults: PortForwardResult[]) => {
+  const log = createLogger("createReverseProxyServer");
+  const app = express();
+  const router: Record<string, string> = {};
+  portForwardResults.forEach(({ localPort, serverName }) => {
+    router[serverName] = `http://localhost:${localPort}`;
+  });
+
+  const proxyMiddleware = createProxyMiddleware({
+    router,
+    logLevel: "debug",
+  });
+
+  app.use("", proxyMiddleware);
+  const server = app.listen(80, () => {
+    log.debug({ message: "Proxy Server Start" });
+  });
+
+  server.on("close", () => {
+    log.debug({ message: "Proxy Server Close" });
+  });
+  return server;
 };
