@@ -9,12 +9,18 @@ export const portForward = async (k8sMappingMap: Record<string, Mapping[]>): Pro
       await ku.changeContext(context);
       return await Promise.all(
         items.map(async ({ namespace, deployment }) => {
-          const [pod] = await ku.getPods({ namespace, deployment });
-          const { pod: podName, port } = pod;
-          const { localPort } = await ku.portForwardWithPod({ namespace, deployment, pod: podName, port });
+          const pods = await ku.getPods({ namespace, deployment });
+          const [pod] = pods;
           const serverName = `${pod.deployment}.${pod.namespace}`;
-          log.debug({ message: `http://${serverName} -> http://127.0.0.1:${localPort}` });
-          return { serverName, localPort };
+          const localPorts = await Promise.all(
+            pods.map(async (targetPod) => {
+              const { localPort } = await ku.portForwardWithPod(targetPod);
+              log.debug({ message: `http://${serverName} -> http://127.0.0.1:${localPort}` });
+              return localPort;
+            })
+          );
+
+          return { serverName, localPorts };
         })
       );
     })

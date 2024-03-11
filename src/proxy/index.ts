@@ -1,45 +1,31 @@
-import * as path from "path";
-import { configuration } from "../configuration";
-import { createLogger } from "../logger";
-import { PortForwardResult } from "../types";
-import { makeDirectory, writeFile } from "../utils";
 import express from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
+import type { Options, Request } from "http-proxy-middleware/dist/types";
+import { createLogger } from "../logger";
+import { ProxyTable } from "../types";
 
-type Props = {
-  serverName: string;
-  localPort: number;
-};
-
-export const templateNginxConf = ({ serverName, localPort }: Props) => {
-  const logger = createLogger("templateNginxConf");
-  logger.debug({ message: `create for ${serverName}:${localPort}` });
-  return `server {
-      listen       80;
-      listen  [::]:80;
-      server_name  ${serverName};
-  
-      location / {
-          proxy_pass http://host.docker.internal:${localPort};
-      }
-  }
-  `;
-};
-
-export const createNginxReverseProxyConfig = async (portForwardResults: PortForwardResult[]) => {
-  const confDirectory = path.resolve(configuration.assetsPath, "etc", "nginx", "conf.d");
-  const content = portForwardResults.map((item) => templateNginxConf(item)).join("\n");
-  await makeDirectory(confDirectory);
-  await writeFile(path.resolve(confDirectory, "default.conf"), content);
-};
-
-export const createReverseProxyServer = (portForwardResults: PortForwardResult[]) => {
-  const log = createLogger("createReverseProxyServer");
+export const createReverseProxyLoadBalanceServer = (table: ProxyTable) => {
+  const log = createLogger("createReverseProxyLoadBalanceServer");
   const app = express();
-  const router: Record<string, string> = {};
-  portForwardResults.forEach(({ localPort, serverName }) => {
-    router[serverName] = `http://localhost:${localPort}`;
-  });
+  const memo = new Map<string, number>();
+
+  const router = (request: Request): Options["target"] => {
+    const hostname = request.hostname;
+    if (!memo.has(hostname)) {
+      memo.set(hostname, 0);
+    }
+    const ports = table[hostname];
+    const currentCount = memo.get(hostname)!;
+    const index = currentCount % ports.length;
+    memo.set(hostname, currentCount + 1);
+    const target = ports[index];
+
+    return {
+      protocol: "http:",
+      host: "127.0.0.1",
+      port: target.port,
+    };
+  };
 
   const proxyMiddleware = createProxyMiddleware({
     router,

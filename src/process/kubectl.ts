@@ -1,6 +1,6 @@
 import { spawn } from "child_process";
 import { createLogger } from "../logger";
-import { Deployment, PortForwardDeplyoment, PortForwardPod } from "../types";
+import { Deployment, PortForwardDeployment, PortForwardPod } from "../types";
 
 const serializeCommand = (event: string, command: string[]) => `| ${event} | COMMAND - kubectl ${command.join(" ")}`;
 
@@ -62,7 +62,7 @@ const kubectl = async (...command: string[]) => {
 };
 
 const ku = {
-  portForwardWithDeployment: async ({ namespace, deployment, port }: PortForwardDeplyoment) => {},
+  portForwardWithDeployment: async ({ namespace, deployment, port }: PortForwardDeployment) => {},
   portForwardWithPod: async ({ namespace, pod, port }: PortForwardPod) => {
     const message = await kubectl("port-forward", `pods/${pod}`, "-n", namespace, `:${port}`);
     const line = message.split("\n")[0];

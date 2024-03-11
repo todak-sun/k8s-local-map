@@ -2,8 +2,8 @@ import { Server } from "http";
 import { readSettings } from "./app/settings";
 import { createLogger } from "./logger";
 import { modifyHosts, portForward } from "./process";
-import { createReverseProxyServer } from "./proxy";
-import { Mapping } from "./types";
+import { createReverseProxyLoadBalanceServer } from "./proxy";
+import { Mapping, ProxyTable } from "./types";
 
 let proxyServer: Server;
 
@@ -21,7 +21,13 @@ async function main() {
   }, {} as Record<string, Mapping[]>);
 
   const portForwardResults = await portForward(k8sMappingMap);
-  proxyServer = createReverseProxyServer(portForwardResults);
+  const table: ProxyTable = {};
+  portForwardResults.forEach((item) => {
+    const { serverName, localPorts } = item;
+    table[serverName] = localPorts.map((port) => ({ port }));
+  });
+
+  proxyServer = createReverseProxyLoadBalanceServer(table);
   await modifyHosts(k8sMappingMap);
 }
 

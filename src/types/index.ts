@@ -7,7 +7,7 @@ export type Pod = Deployment & {
   pod: string;
 };
 
-export type PortForwardDeplyoment = Deployment & {
+export type PortForwardDeployment = Deployment & {
   port: number;
 };
 
@@ -27,5 +27,9 @@ export type Settings = {
 
 export type PortForwardResult = {
   serverName: string;
-  localPort: number;
+  localPorts: number[];
+};
+
+export type ProxyTable = {
+  [host: string]: { port: number }[];
 };
