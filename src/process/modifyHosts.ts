@@ -43,12 +43,13 @@ export const clearUnusedHosts = async () => {
 
 export const modifyHosts = async (k8sMappingMap: Record<string, Mapping[]>) => {
   await clearUnusedHosts();
+
   // 세팅에 적힌 내용을 토대로, etc/hosts 파일에 작성할 내용 만들기
   const log = createLogger("modifyHosts");
   const textToWrite = ["\n", HOSTS_START_COMMENT];
   Object.entries(k8sMappingMap).forEach(([context, items]) => {
     items.forEach(({ deployment, namespace }) => {
-      textToWrite.push(`127.0.0.1\t${deployment}.${namespace} # context=${context} namespace=${namespace} deployment=${deployment}`);
+      textToWrite.push(`127.0.0.1\t${deployment}.${namespace}`);
     });
   });
   textToWrite.push(HOSTS_END_COMMENT);
